@@ -9,6 +9,12 @@ metadata:
 spec:
   priorityClassName: system-node-critical
   hostNetwork: true
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+    fsGroupChangePolicy: Always
   volumes:
   - name: etcd-certs
     hostPath:
@@ -32,13 +38,12 @@ spec:
     args:
     - run
     securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      runAsNonRoot: true
-      readOnlyRootFilesystem: true
       capabilities:
         add:
+        # for keepalived vrrp
         - NET_RAW
+        # for flock
+        - LEASE
     volumeMounts:
     - mountPath: /data
       name: litekube-data
