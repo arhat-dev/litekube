@@ -4,21 +4,11 @@ set -ex
 
 litestream_config_file="/data/litestream.yaml"
 supervisord_config_file="/data/supervisord.conf"
-supervisord_server_url="http://localhost:9001"
+supervisord_server_url="http://localhost:19001"
 master_flag_file="/data/.vrrp_master"
 main_db="/data/db.sqlite"
 
 instance_lock="/data/litekube.lock"
-
-_lock() {
-  # shellcheck disable=SC3023
-  exec 100>"${instance_lock}"
-  flock -x -n 100
-}
-
-_unlock() {
-  flock -u 100
-}
 
 __create_master_flag_file() {
   while [ ! -f "${master_flag_file}" ]; do
@@ -36,8 +26,6 @@ __remove_master_flag_file() {
 
 _cleanup() {
   __remove_master_flag_file
-
-  _unlock
 }
 
 _retore_latest() {
@@ -53,10 +41,8 @@ _retore_latest() {
     /data/db.sqlite
 }
 
-_run() {
+__do_run() {
   trap _cleanup EXIT
-
-  _lock
 
   cat <<EOF >"${supervisord_config_file}"
 [supervisord]
@@ -153,6 +139,13 @@ EOF
   . /app/.venv/bin/activate
 
   exec supervisord --nodaemon -c "${supervisord_config_file}"
+}
+_run() {
+  # shellcheck disable=SC3023
+  (
+    flock -x -n 200
+    __do_run
+  ) 200>"${instance_lock}"
 }
 
 __start_replication() {
@@ -260,6 +253,9 @@ restore)
   ;;
 run)
   _run
+  ;;
+__do_run)
+  __do_run
   ;;
 on_vrrp_master)
   _on_vrrp_master
