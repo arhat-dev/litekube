@@ -16,13 +16,10 @@ ARG MATRIX_ARCH
 COPY scripts/prepare.sh /prepare.sh
 RUN sh /prepare.sh "${MATRIX_OS}" && rm -f /prepare.sh
 
-RUN mkdir -p /data /etcd-certs /var/lib/supervisord /run/keepalived && \
-    chown -R litekube:litekube /data /etcd-certs /var/lib/supervisord /run/keepalived
+RUN mkdir -p /data /etcd-certs /var/lib/supervisord /run/keepalived
 
-USER litekube
-
-VOLUME /etcd-certs
 VOLUME /data
+VOLUME /etcd-certs
 
 COPY --chmod=0555 scripts/entrypoint.sh /usr/local/bin/entrypoint
 COPY --from=builder /app /app

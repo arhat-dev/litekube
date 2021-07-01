@@ -9,12 +9,6 @@ metadata:
 spec:
   priorityClassName: system-node-critical
   hostNetwork: true
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    runAsNonRoot: true
-    fsGroup: 1000
-    fsGroupChangePolicy: Always
   volumes:
   - name: etcd-certs
     hostPath:
@@ -24,29 +18,29 @@ spec:
     hostPath:
       path: /var/lib/litekube
       type: DirectoryOrCreate
-  initContainers:
-  - name: restore-data
-    image: ghcr.io/arhat-dev/litekube:latest-debian
-    args:
-    - restore
-    volumeMounts:
-    - name: litekube-data
-      mountPath: /data
   containers:
   - name: litekube
-    image: ghcr.io/arhat-dev/litekube:latest-debian
+    image: ghcr.io/arhat-dev/litekube:latest-alpine
+    imagePullPolicy: Always
+    env:
+    - name: DEBUG_KINE
+      value: "false"
     args:
     - run
     securityContext:
+      privileged: true
       capabilities:
         add:
         # for keepalived vrrp
-        - NET_RAW
+        - NET_ADMIN
         # for flock
-        - LEASE
+        # - LEASE
+        drop:
+        - ALL
     volumeMounts:
     - mountPath: /data
       name: litekube-data
+      mountPropagation: Bidirectional
     - mountPath: /etcd-certs
       name: etcd-certs
     resources: {}
@@ -56,23 +50,23 @@ spec:
     # litestream metrics
     - name: ls-metrics
       containerPort: 19090
-    livenessProbe:
-      failureThreshold: 8
-      httpGet:
-        host: 127.0.0.1
-        path: /health
-        port: 12379
-        scheme: HTTP
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      timeoutSeconds: 15
-    startupProbe:
-      failureThreshold: 24
-      httpGet:
-        host: 127.0.0.1
-        path: /health
-        port: 12379
-        scheme: HTTP
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      timeoutSeconds: 15
+    # livenessProbe:
+    #   failureThreshold: 8
+    #   httpGet:
+    #     host: 127.0.0.1
+    #     path: /health
+    #     port: 12379
+    #     scheme: HTTP
+    #   initialDelaySeconds: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 15
+    # startupProbe:
+    #   failureThreshold: 24
+    #   httpGet:
+    #     host: 127.0.0.1
+    #     path: /health
+    #     port: 12379
+    #     scheme: HTTP
+    #   initialDelaySeconds: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 15

@@ -2,6 +2,7 @@
 addr: ":19090"
 
 dbs:
+  # DO NOT change the path
 - path: /data/db.sqlite
   # MUST set at least one replication method
   replicas: []

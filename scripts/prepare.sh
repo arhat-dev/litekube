@@ -2,20 +2,30 @@
 
 set -ex
 
+setup_sudoer() {
+  cat <<EOF > /etc/sudoers.d/100-keepalived
+keepalived_script ALL=NOPASSWD: /usr/local/bin/entrypoint*
+EOF
+}
+
 _prepare_debian() {
-  addgroup --system --gid 1000 litekube
-  adduser --system --shell "$(which nologin)" \
-    --disabled-password --no-create-home \
-    --uid 1000 --gid 1000 litekube
   apt-get update
-  apt-get install -y keepalived
+  apt-get install -y keepalived sudo
+
+  adduser --system --shell "$(which nologin)" \
+    --disabled-password --no-create-home keepalived_script
+
+  setup_sudoer
+
   rm -rf /var/lib/apt/lists/*
 }
 
 _prepare_alpine() {
-  addgroup -S -g 1000 litekube
-  adduser -s "$(which nologin)" -S -D -H -u 1000 -G litekube litekube
-  apk add --no-cache keepalived
+  apk add --no-cache keepalived sudo
+
+  adduser -s "$(which nologin)" -S -D -H keepalived_script
+
+  setup_sudoer
 }
 
 case "$1" in
