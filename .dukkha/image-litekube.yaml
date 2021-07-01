@@ -1,5 +1,6 @@
 buildah:bud:
-- name: litekube
+- &build_litekube_image
+  name: litekube
   matrix@file: .dukkha/matrix.yml
   dockerfile: Dockerfile
   image_names@template: |-
@@ -11,8 +12,15 @@ buildah:bud:
   - --build-arg="MATRIX_ARCH=${MATRIX_ARCH}"
 
 buildah:push:
-- name: litekube
+- &push_litekube_image
+  name: litekube
   matrix@file: .dukkha/matrix.yml
   image_names@template: |-
     - image: ghcr.io/arhat-dev/litekube:latest-{{ .Env.MATRIX_OS }}-{{ .Env.MATRIX_ARCH }}
       manifest: ghcr.io/arhat-dev/litekube:latest-{{ .Env.MATRIX_OS }}
+
+docker:build:
+- *build_litekube_image
+
+docker:push:
+- *push_litekube_image

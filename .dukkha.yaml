@@ -7,27 +7,6 @@ tools:
       - -v go-path:/go
       - --workdir $(pwd)
       - -v ${DUKKHA_WORKING_DIR}:${DUKKHA_WORKING_DIR}
-      {{- range $key, $val := .Env }}
-      {{- if not (or
-        (eq $key "PATH" "TMPDIR" "SHELL" "LANG" "OLDPWD" "USER" "ZSH" "GIT_ASKPASS" "ZDOTDIR")
-        ($key | hasPrefix "_")
-        ($key | hasPrefix "KUBIE_")
-        ($key | hasPrefix "LC_")
-        ($key | contains "TERM")
-        ($key | hasPrefix "VSCODE_")
-        ($key | hasPrefix "XPC_")
-        ($key | hasPrefix "COMMAND_")
-        ($key | contains "XDG")
-        ($key | contains "WASM")
-        ($key | contains "COLOR")
-        ($key | contains "KUBE")
-        ($key | contains "VIRTUAL")
-        ($key | contains "SSH")
-        )
-      }}
-      {{- printf "- --env %s=\"%s\"" $key $val | nindent 0 -}}
-      {{- end }}
-      {{- end }}
       - ghcr.io/arhat-dev/builder-go:{{ .Env.MATRIX_OS }}-{{ .Env.MATRIX_ARCH }}
       - go
 
@@ -45,6 +24,10 @@ tools:
         --device /dev/fuse:rw \
         quay.io/buildah/stable \
         buildah
+  docker:
+  - name: local
+    env:
+    - DOCKER_BUILDKIT=1
 
 shells:
 - name: bash
