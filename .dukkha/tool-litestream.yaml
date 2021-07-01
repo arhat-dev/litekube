@@ -1,0 +1,31 @@
+golang:build:
+- name: litestream
+  chdir: build/litestream
+  path: ./cmd/litestream
+  hooks:
+    before:
+    - shell: |-
+        # https://github.com/benbjohnson/litestream/releases
+        LITESTREAM_VERSION=v0.3.5
+
+        [ -d build/litestream ] && exit 0
+
+        git clone -b ${LITESTREAM_VERSION} \
+          https://github.com/benbjohnson/litestream.git \
+          build/litestream
+    after:matrix:success@template: |-
+      - shell: |-
+          file build/litestream.{{ .Env.MATRIX_OS }}.{{ .Env.MATRIX_ARCH }}
+  matrix@file: .dukkha/matrix.yml
+  cgo:
+    enabled: true
+  outputs@shell: |-
+    cat <<EOF
+    - ${DUKKHA_WORKING_DIR}/build/litestream.${MATRIX_OS}.${MATRIX_ARCH}
+    EOF
+  ldflags:
+  - -s -w
+  - -X main.Version=${LITESTREAM_VERSION}
+  extraArgs:
+  - -v
+  - -trimpath

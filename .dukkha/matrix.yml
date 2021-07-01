@@ -1,0 +1,9 @@
+os:
+- debian
+- alpine
+kernel:
+- linux
+arch:
+- amd64
+- arm64
+- armv7

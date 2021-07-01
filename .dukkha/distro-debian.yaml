@@ -1,0 +1,27 @@
+buildah:bud:
+- name: debian
+  matrix: &debian_matrix
+    os:
+    - debian
+    kernel:
+    - linux
+    arch:
+    - amd64
+    - arm64
+    rootfs:
+    - 10.10-slim
+    kube:
+    # - v1.21.2
+    - v1.20.8
+  image_names@template: &debian_image_names |-
+    - image: ghcr.io/arhat-dev/litekube-{{ .Env.MATRIX_KUBE }}:debian-{{ .Env.MATRIX_ARCH }}
+      manifest: ghcr.io/arhat-dev/litekube-{{ .Env.MATRIX_KUBE }}:debian
+  dockerfile: debian/Dockerfile
+  extraArgs@template: |-
+    - --build-arg="ARCH_REPO={{ .Env.MATRIX_ARCH | getDockerHubArch }}"
+    - --build-arg="DEBIAN_VERSION={{ .Env.MATRIX_ROOTFS }}"
+
+buildah:push:
+- name: debian
+  matrix: *debian_matrix
+  image_names@template: *debian_image_names

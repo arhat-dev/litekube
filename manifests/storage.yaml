@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: litekube
+  labels:
+    name: litekube
+spec:
+  hostNetwork: true
+  volumes:
+  - name: etcd-certs
+    hostPath:
+      path: /etc/kubernetes/pki/etcd
+      type: DirectoryOrCreate
+  - name: litekube-data
+    hostPath:
+      path: /var/lib/litekube
+      type: DirectoryOrCreate
+  initContainers:
+  - name: restore-data
+    image: ghcr.io/arhat-dev/litekube:latest
+    args:
+    - restore
+    volumeMounts:
+    - name: litekube-data
+      mountPath: /data
+  containers:
+  - name: litekube
+    image: ghcr.io/arhat-dev/litekube:latest
+    args:
+    - run
+    volumeMounts:
+    - mountPath: /data
+      name: litekube-data
+    - mountPath: /etcd-certs
+      name: etcd-certs
+    resources: {}
+    ports:
+    - name: client
+      containerPort: 2379
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /health
+        port: 2381
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /health
+        port: 2381
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15

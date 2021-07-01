@@ -1,0 +1,31 @@
+golang:build:
+- name: kine
+  chdir: build/kine
+  path: ./
+  hooks:
+    before:
+    - shell: |-
+        # https://github.com/k3s-io/kine/releases
+        KINE_VERSION=v0.6.1
+
+        [ -d build/kine ] && exit 0
+
+        git clone -b ${KINE_VERSION} \
+          https://github.com/k3s-io/kine.git \
+          build/kine
+    after:matrix:success@template: |-
+      - shell: |-
+          file build/kine.{{ .Env.MATRIX_OS }}.{{ .Env.MATRIX_ARCH }}
+  matrix@file: .dukkha/matrix.yml
+  cgo:
+    # sqlite driver requires cgo
+    enabled: true
+  outputs@shell: |-
+    cat <<EOF
+    - ${DUKKHA_WORKING_DIR}/build/kine.${MATRIX_OS}.${MATRIX_ARCH}
+    EOF
+  ldflags:
+  - -s -w
+  extraArgs:
+  - -v
+  - -mod=readonly

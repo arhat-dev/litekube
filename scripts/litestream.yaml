@@ -1,0 +1,48 @@
+# metrics listener
+addr: ":9090"
+
+dbs:
+- path: /data/db.sqlite
+  replicas:
+
+  # https://litestream.io/reference/config/#file-replica
+  - type: file
+    path: /data/db.backup
+    retention: 24h
+    retention-check-interval: 1h
+    snapshot-interval: 24h
+    # validation-interval: 7d
+
+  # # https://litestream.io/guides/sftp/
+  # - type: sftp
+  #   host: HOST:PORT
+  #   user: USER
+  #   password: PASSWORD
+  #   path: PATH
+  #   key-path: /path/to/ssh_identity
+
+  # # https://litestream.io/guides/s3/
+  # # https://litestream.io/guides/backblaze/
+  # # https://litestream.io/guides/digitalocean/
+  # # https://litestream.io/guides/linode/
+  # - type: s3
+  #   bucket: BUCKETNAME
+  #   path: PATHNAME
+  #   region: us-east-1
+  #   access-key-id: <access-key-id>
+  #   secret-access-key: <access-key-secret>
+  #   # force-path-style: true
+  #   # skip-verify: false
+  #   # sync-interval: 1s
+
+  # # https://litestream.io/guides/azure/
+  # - type: abs
+  #   account-name: STORAGEACCOUNT
+  #   account-key: ACCOUNTKEY
+  #   bucket: CONTAINERNAME
+  #   path: PATH
+
+  # # https://litestream.io/guides/gcs/
+  # - type: gcs
+  #   bucket: BUCKET
+  #   path: PATH
