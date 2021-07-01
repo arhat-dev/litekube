@@ -1,17 +1,10 @@
 # metrics listener
-addr: ":9090"
+addr: ":19090"
 
 dbs:
 - path: /data/db.sqlite
-  replicas:
-
-  # https://litestream.io/reference/config/#file-replica
-  - type: file
-    path: /data/db.backup
-    retention: 24h
-    retention-check-interval: 1h
-    snapshot-interval: 24h
-    # validation-interval: 7d
+  # MUST set at least one replication method
+  replicas: []
 
   # # https://litestream.io/guides/sftp/
   # - type: sftp
@@ -19,7 +12,11 @@ dbs:
   #   user: USER
   #   password: PASSWORD
   #   path: PATH
-  #   key-path: /path/to/ssh_identity
+  #   key-path: /data/sftp-identity
+  #   retention: 24h
+  #   retention-check-interval: 1h
+  #   snapshot-interval: 24h
+  #   validation-interval: 1d
 
   # # https://litestream.io/guides/s3/
   # # https://litestream.io/guides/backblaze/
@@ -34,6 +31,10 @@ dbs:
   #   # force-path-style: true
   #   # skip-verify: false
   #   # sync-interval: 1s
+  #   retention: 24h
+  #   retention-check-interval: 1h
+  #   snapshot-interval: 24h
+  #   # validation-interval: 7d
 
   # # https://litestream.io/guides/azure/
   # - type: abs
@@ -41,8 +42,25 @@ dbs:
   #   account-key: ACCOUNTKEY
   #   bucket: CONTAINERNAME
   #   path: PATH
+  #   retention: 24h
+  #   retention-check-interval: 1h
+  #   snapshot-interval: 24h
+  #   # validation-interval: 7d
 
   # # https://litestream.io/guides/gcs/
   # - type: gcs
   #   bucket: BUCKET
   #   path: PATH
+  #   retention: 24h
+  #   retention-check-interval: 1h
+  #   snapshot-interval: 24h
+  #   # validation-interval: 7d
+
+  # # DO NOT USE FILE if you're running on multiple nodes!
+  # # https://litestream.io/reference/config/#file-replica
+  # - type: file
+  #   path: /data/db.backup
+  #   retention: 24h
+  #   retention-check-interval: 1h
+  #   snapshot-interval: 24h
+  #   # validation-interval: 7d

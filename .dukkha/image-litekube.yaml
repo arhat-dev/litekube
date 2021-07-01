@@ -2,7 +2,7 @@ buildah:bud:
 - &build_litekube_image
   name: litekube
   matrix@file: .dukkha/matrix.yml
-  dockerfile: Dockerfile
+  dockerfile: litekube.dockerfile
   image_names@template: |-
     - image: ghcr.io/arhat-dev/litekube:latest-{{ .Env.MATRIX_OS }}-{{ .Env.MATRIX_ARCH }}
       manifest: ghcr.io/arhat-dev/litekube:latest-{{ .Env.MATRIX_OS }}
