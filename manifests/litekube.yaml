@@ -42,7 +42,7 @@ spec:
       httpGet:
         host: 127.0.0.1
         path: /health
-        port: 2381
+        port: 2379
         scheme: HTTP
       initialDelaySeconds: 10
       periodSeconds: 10
@@ -52,7 +52,7 @@ spec:
       httpGet:
         host: 127.0.0.1
         path: /health
-        port: 2381
+        port: 2379
         scheme: HTTP
       initialDelaySeconds: 10
       periodSeconds: 10
