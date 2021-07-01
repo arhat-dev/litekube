@@ -62,8 +62,8 @@ jobs:
 
     - name: Build Tools
       run: |-
-        dukkha golang in-docker build litestream
-        dukkha golang in-docker build kine
+        dukkha golang github-docker build litestream
+        dukkha golang github-docker build kine
 
     - name: Build and Push Images
       env:
